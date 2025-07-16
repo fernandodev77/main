@@ -14,8 +14,8 @@
     <div id="home-screen" class="screen active">
         <div class="home-content">
             <div class="logo">
-                <h1>Disonancia</h1>
-                <p>Reproductor Musical</p>
+                <h1>Magia de Curacion</h1>
+                <p>Sonido Galaxy</p>
             </div>
             
             <!-- Contador regresivo -->
@@ -51,15 +51,36 @@
     
     <!-- Pantalla del reproductor -->
     <div id="player-screen" class="screen">
+        <!-- Switch de modo visualización (navbar fijo) -->
+        <div class="navbar-switch">
+            <label class="switch">
+                <input type="checkbox" id="visualization-mode-toggle">
+                <span class="slider"></span>
+            </label>
+            <span class="switch-label">Animación</span>
+        </div>
+        
         <div class="player-container">
             <!-- Botón de regreso -->
             <button id="back-button" class="back-btn">←</button>
             
-            <!-- Cover del álbum -->
-            <div class="cover-container">
-                <img id="album-cover" src="" alt="Album Cover">
+            <!-- Selector de estilos de visualización (solo visible en modo animación) -->
+            <div id="style-selector" class="style-selector-top hidden">
+                <div class="style-options">
+                    <button class="style-btn active" data-style="0">Galaxia</button>
+                    <button class="style-btn" data-style="1">Nebulosa</button>
+                    <button class="style-btn" data-style="2">Cosmos</button>
+                </div>
+            </div>
+            
+            <!-- Área de visualización (cover o canvas) -->
+            <div class="visualization-area">
+                <!-- Cover del álbum -->
+                <div id="cover-container" class="cover-container">
+                    <img id="album-cover" src="" alt="Album Cover">
+                </div>
                 
-                <!-- Canvas de visualización 3D (oculto por defecto) -->
+                <!-- Canvas de visualización 3D -->
                 <canvas id="visualizer-canvas" class="visualizer-canvas hidden"></canvas>
             </div>
             
@@ -103,20 +124,7 @@
                 </button>
             </div>
             
-            <!-- Botón de visualización -->
-            <button id="visualizer-toggle" class="visualizer-toggle">
-                🎨 Visualización
-            </button>
-            
-            <!-- Selector de estilos de visualización -->
-            <div id="style-selector" class="style-selector hidden">
-                <h3>Estilo de Visualización</h3>
-                <div class="style-options">
-                    <button class="style-btn active" data-style="0">Galaxia</button>
-                    <button class="style-btn" data-style="1">Nebulosa</button>
-                    <button class="style-btn" data-style="2">Cosmos</button>
-                </div>
-            </div>
+
         </div>
     </div>
     

@@ -571,46 +571,44 @@ function generateAnimatedWebM() {
 }
 
 /**
- * Dibuja el fondo animado para el frame actual
+ * Dibuja el fondo animado para el frame actual optimizado para formato vertical
  */
 function drawAnimatedBackground(ctx, width, height, frameIndex) {
     const progress = frameIndex / 75; // 75 frames total (5 segundos * 15 fps)
     
-    // Gradiente animado de fondo
-    const gradient = ctx.createRadialGradient(
-        width/2, height/2, 0,
-        width/2, height/2, Math.max(width, height)/2
-    );
+    // Gradiente animado de fondo vertical
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
     
     // Colores que cambian con el tiempo
     const hue1 = (progress * 360) % 360;
     const hue2 = (progress * 360 + 120) % 360;
     const hue3 = (progress * 360 + 240) % 360;
     
-    gradient.addColorStop(0, `hsl(${hue1}, 70%, 25%)`);
-    gradient.addColorStop(0.3, `hsl(${hue2}, 60%, 20%)`);
-    gradient.addColorStop(0.7, `hsl(${hue3}, 50%, 15%)`);
-    gradient.addColorStop(1, `hsl(${hue1 + 60}, 40%, 10%)`);
+    gradient.addColorStop(0, `hsl(${hue1}, 80%, 15%)`);
+    gradient.addColorStop(0.3, `hsl(${hue2}, 70%, 10%)`);
+    gradient.addColorStop(0.7, `hsl(${hue3}, 60%, 8%)`);
+    gradient.addColorStop(1, `hsl(${hue1 + 180}, 50%, 5%)`);
     
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     
-    // Ondas de audio simuladas
-    const waveCount = 8;
+    // Ondas de audio verticales para formato Stories
+    const waveCount = 12;
     for (let w = 0; w < waveCount; w++) {
         ctx.beginPath();
-        ctx.strokeStyle = `hsla(${(hue1 + w * 45) % 360}, 70%, 50%, 0.3)`;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = `hsla(${(hue1 + w * 30) % 360}, 80%, 60%, ${0.2 + Math.sin(progress * Math.PI * 4 + w) * 0.1})`;
+        ctx.lineWidth = 3 + Math.sin(progress * Math.PI * 6 + w) * 1;
         
-        const waveOffset = w * 50;
-        const waveSpeed = progress * Math.PI * 4 + w * 0.5;
+        const waveOffset = w * 80;
+        const waveSpeed = progress * Math.PI * 6 + w * 0.8;
+        const baseX = (width / waveCount) * w + width / (waveCount * 2);
         
-        for (let x = 0; x < width; x += 5) {
-            const y = height/2 + 
-                Math.sin((x + waveOffset) * 0.01 + waveSpeed) * 30 +
-                Math.sin((x + waveOffset) * 0.02 + waveSpeed * 1.5) * 15;
+        for (let y = 0; y < height; y += 8) {
+            const x = baseX + 
+                Math.sin((y + waveOffset) * 0.008 + waveSpeed) * 40 +
+                Math.sin((y + waveOffset) * 0.015 + waveSpeed * 1.3) * 20;
             
-            if (x === 0) {
+            if (y === 0) {
                 ctx.moveTo(x, y);
             } else {
                 ctx.lineTo(x, y);
@@ -619,46 +617,89 @@ function drawAnimatedBackground(ctx, width, height, frameIndex) {
         ctx.stroke();
     }
     
-    // Partículas flotantes
-    const particleCount = 40;
+    // Partículas flotantes distribuidas verticalmente
+    const particleCount = 60;
     for (let i = 0; i < particleCount; i++) {
-        const angle = (i / particleCount) * Math.PI * 2 + progress * Math.PI;
-        const radius = 80 + Math.sin(progress * Math.PI * 3 + i) * 40;
-        const pulseRadius = 150 + Math.cos(progress * Math.PI * 2 + i * 0.5) * 100;
+        // Distribución más vertical para Stories
+        const verticalProgress = (i / particleCount);
+        const horizontalVariation = Math.sin(progress * Math.PI * 2 + i * 0.3) * 0.4;
         
-        const x = width/2 + Math.cos(angle) * radius;
-        const y = height/2 + Math.sin(angle) * radius;
+        const x = width * (0.3 + horizontalVariation * 0.4) + Math.cos(progress * Math.PI * 3 + i) * 100;
+        const y = height * verticalProgress + Math.sin(progress * Math.PI * 4 + i * 0.5) * 80;
         
-        // Partícula principal
+        // Partícula principal con efecto de profundidad
+        ctx.save();
+        const depth = Math.sin(progress * Math.PI * 2 + i) * 0.5 + 0.5;
+        const size = (2 + depth * 3) * (1 + Math.sin(progress * Math.PI * 8 + i) * 0.3);
+        
+        ctx.globalAlpha = 0.6 + depth * 0.4;
         ctx.beginPath();
-        const size = 1.5 + Math.sin(progress * Math.PI * 6 + i) * 0.8;
         ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${(hue1 + i * 15) % 360}, 80%, 70%, 0.8)`;
-        ctx.fill();
         
-        // Partículas de pulso
-        if (i % 3 === 0) {
-            const pulseX = width/2 + Math.cos(angle * 0.7) * pulseRadius;
-            const pulseY = height/2 + Math.sin(angle * 0.7) * pulseRadius;
+        // Gradiente para cada partícula
+        const particleGradient = ctx.createRadialGradient(x, y, 0, x, y, size * 2);
+        particleGradient.addColorStop(0, `hsla(${(hue1 + i * 12) % 360}, 90%, 70%, 1)`);
+        particleGradient.addColorStop(1, `hsla(${(hue1 + i * 12) % 360}, 90%, 70%, 0)`);
+        
+        ctx.fillStyle = particleGradient;
+        ctx.fill();
+        ctx.restore();
+        
+        // Partículas secundarias para mayor densidad
+        if (i % 4 === 0) {
+            const secondaryX = x + Math.cos(progress * Math.PI * 5 + i) * 60;
+            const secondaryY = y + Math.sin(progress * Math.PI * 5 + i) * 60;
             
+            ctx.save();
+            ctx.globalAlpha = 0.3;
             ctx.beginPath();
-            ctx.arc(pulseX, pulseY, 1, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${(hue2 + i * 20) % 360}, 90%, 80%, 0.4)`;
+            ctx.arc(secondaryX, secondaryY, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${(hue2 + i * 18) % 360}, 100%, 80%, 0.6)`;
             ctx.fill();
+            ctx.restore();
         }
     }
     
-    // Efecto de brillo central
-    const glowGradient = ctx.createRadialGradient(
-        width/2, height/2, 0,
-        width/2, height/2, 100
-    );
-    const glowIntensity = 0.1 + Math.sin(progress * Math.PI * 8) * 0.05;
-    glowGradient.addColorStop(0, `hsla(${hue1}, 100%, 80%, ${glowIntensity})`);
-    glowGradient.addColorStop(1, 'hsla(0, 0%, 0%, 0)');
+    // Efectos de brillo múltiples para mayor dinamismo
+    for (let g = 0; g < 3; g++) {
+        const glowY = height * (0.2 + g * 0.3) + Math.sin(progress * Math.PI * 3 + g) * 200;
+        const glowX = width / 2 + Math.cos(progress * Math.PI * 2 + g * 0.7) * 150;
+        
+        const glowGradient = ctx.createRadialGradient(
+            glowX, glowY, 0,
+            glowX, glowY, 120 + g * 40
+        );
+        
+        const glowIntensity = (0.08 + Math.sin(progress * Math.PI * 6 + g * 2) * 0.04) * (1 - g * 0.3);
+        glowGradient.addColorStop(0, `hsla(${(hue1 + g * 60) % 360}, 100%, 80%, ${glowIntensity})`);
+        glowGradient.addColorStop(0.5, `hsla(${(hue2 + g * 60) % 360}, 100%, 60%, ${glowIntensity * 0.5})`);
+        glowGradient.addColorStop(1, 'hsla(0, 0%, 0%, 0)');
+        
+        ctx.fillStyle = glowGradient;
+        ctx.fillRect(0, 0, width, height);
+    }
     
-    ctx.fillStyle = glowGradient;
-    ctx.fillRect(0, 0, width, height);
+    // Líneas de energía verticales
+    const energyLineCount = 6;
+    for (let e = 0; e < energyLineCount; e++) {
+        const lineX = (width / energyLineCount) * e + width / (energyLineCount * 2);
+        const lineOpacity = Math.sin(progress * Math.PI * 4 + e * 1.2) * 0.3 + 0.1;
+        
+        if (lineOpacity > 0) {
+            ctx.save();
+            ctx.globalAlpha = lineOpacity;
+            ctx.strokeStyle = `hsla(${(hue3 + e * 40) % 360}, 100%, 70%, 1)`;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 20]);
+            ctx.lineDashOffset = -progress * 100;
+            
+            ctx.beginPath();
+            ctx.moveTo(lineX, 0);
+            ctx.lineTo(lineX, height);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
 }
 
 /**

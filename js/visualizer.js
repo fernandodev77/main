@@ -25,13 +25,22 @@ class AudioVisualizer {
     }
     
     setupThreeJS() {
+        if (!this.canvas) {
+            console.error('Canvas del visualizador no encontrado');
+            return;
+        }
+        
         // Crear escena
         this.scene = new THREE.Scene();
+        
+        // Obtener dimensiones del canvas
+        const width = this.canvas.offsetWidth || 250;
+        const height = this.canvas.offsetHeight || 250;
         
         // Crear cámara
         this.camera = new THREE.PerspectiveCamera(
             75,
-            this.canvas.offsetWidth / this.canvas.offsetHeight,
+            width / height,
             0.1,
             1000
         );
@@ -43,8 +52,10 @@ class AudioVisualizer {
             alpha: true,
             antialias: true
         });
-        this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+        this.renderer.setSize(width, height);
         this.renderer.setClearColor(0x000000, 0);
+        
+        console.log('Visualizador inicializado:', { width, height });
     }
     
     createVisualization() {
@@ -282,11 +293,11 @@ class AudioVisualizer {
     }
     
     setupEventListeners() {
-        // Botón de toggle del visualizador
-        const toggleBtn = document.getElementById('visualizer-toggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                this.toggle();
+        // Switch de modo visualización
+        const modeToggle = document.getElementById('visualization-mode-toggle');
+        if (modeToggle) {
+            modeToggle.addEventListener('change', () => {
+                this.toggleVisualizationMode(modeToggle.checked);
             });
         }
         
@@ -306,23 +317,36 @@ class AudioVisualizer {
         });
     }
     
-    toggle() {
-        this.isActive = !this.isActive;
+    toggleVisualizationMode(isAnimationMode) {
+        this.isActive = isAnimationMode;
         
         const canvas = document.getElementById('visualizer-canvas');
-        const toggleBtn = document.getElementById('visualizer-toggle');
+        const coverContainer = document.getElementById('cover-container');
         const styleSelector = document.getElementById('style-selector');
         
-        if (this.isActive) {
+        if (isAnimationMode) {
+            // Mostrar animación, ocultar cover
             canvas.classList.remove('hidden');
-            toggleBtn.classList.add('active');
+            coverContainer.style.opacity = '0';
+            coverContainer.style.pointerEvents = 'none';
             styleSelector.classList.remove('hidden');
             this.startAnimation();
         } else {
+            // Mostrar cover, ocultar animación
             canvas.classList.add('hidden');
-            toggleBtn.classList.remove('active');
+            coverContainer.style.opacity = '1';
+            coverContainer.style.pointerEvents = 'auto';
             styleSelector.classList.add('hidden');
             this.stopAnimation();
+        }
+    }
+    
+    // Método legacy para compatibilidad
+    toggle() {
+        const modeToggle = document.getElementById('visualization-mode-toggle');
+        if (modeToggle) {
+            modeToggle.checked = !modeToggle.checked;
+            this.toggleVisualizationMode(modeToggle.checked);
         }
     }
     
