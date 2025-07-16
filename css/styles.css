@@ -1,0 +1,506 @@
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
+}
+
+/* Canvas de fondo */
+#background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Pantallas */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+    z-index: 1;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Pantalla de inicio */
+#home-screen {
+    text-align: center;
+}
+
+.home-content {
+    max-width: 600px;
+    padding: 2rem;
+}
+
+.logo h1 {
+    font-size: 4rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #4a90e2, #7b68ee, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 30px rgba(74, 144, 226, 0.5);
+}
+
+.logo p {
+    font-size: 1.2rem;
+    color: #ccc;
+    margin-bottom: 3rem;
+}
+
+/* Contador regresivo */
+.countdown-container {
+    margin-bottom: 3rem;
+}
+
+.countdown-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #7b68ee;
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.time-unit {
+    text-align: center;
+    background: rgba(74, 144, 226, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    border-radius: 15px;
+    padding: 1rem;
+    min-width: 80px;
+    backdrop-filter: blur(10px);
+}
+
+.time-unit span {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00d4ff;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.time-unit label {
+    font-size: 0.8rem;
+    color: #ccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Botón principal */
+.main-button {
+    background: linear-gradient(45deg, #4a90e2, #7b68ee);
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 auto;
+}
+
+.main-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(74, 144, 226, 0.5);
+}
+
+.main-button span {
+    font-size: 1.5rem;
+}
+
+/* Pantalla del reproductor */
+.player-container {
+    max-width: 400px;
+    width: 90%;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+/* Botón de regreso */
+.back-btn {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* Cover del álbum */
+.cover-container {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 2rem;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+#album-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.visualizer-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+}
+
+.visualizer-canvas.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Información de la canción */
+.song-info {
+    margin-bottom: 2rem;
+}
+
+.song-info h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.song-info p {
+    color: #7b68ee;
+    font-size: 1rem;
+}
+
+/* Waveform */
+.waveform-container {
+    margin-bottom: 2rem;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Controles de reproducción */
+.player-controls {
+    margin-bottom: 2rem;
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.play-pause-btn {
+    background: linear-gradient(45deg, #4a90e2, #7b68ee);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+}
+
+.play-pause-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 30px rgba(74, 144, 226, 0.5);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Control de volumen */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.volume-icon {
+    font-size: 1.2rem;
+}
+
+.volume-slider {
+    width: 150px;
+    height: 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4a90e2;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4a90e2;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+}
+
+/* Botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.action-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    border-radius: 25px;
+    padding: 0.8rem 1rem;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.action-btn:hover {
+    background: rgba(74, 144, 226, 0.2);
+    border-color: rgba(74, 144, 226, 0.6);
+    transform: translateY(-2px);
+}
+
+.presave-btn:hover {
+    background: linear-gradient(45deg, #1db954, #1ed760);
+    border-color: #1db954;
+}
+
+/* Botón de visualización */
+.visualizer-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(123, 104, 238, 0.3);
+    border-radius: 25px;
+    padding: 0.8rem 1.5rem;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    margin-bottom: 1rem;
+}
+
+.visualizer-toggle:hover {
+    background: rgba(123, 104, 238, 0.2);
+    border-color: rgba(123, 104, 238, 0.6);
+}
+
+.visualizer-toggle.active {
+    background: linear-gradient(45deg, #7b68ee, #9370db);
+    border-color: #7b68ee;
+}
+
+/* Selector de estilos */
+.style-selector {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    padding: 1rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.style-selector.hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+.style-selector h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #7b68ee;
+}
+
+.style-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.style-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: white;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.style-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.style-btn.active {
+    background: linear-gradient(45deg, #4a90e2, #7b68ee);
+    border-color: #4a90e2;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 3rem;
+    }
+    
+    .countdown {
+        gap: 1rem;
+    }
+    
+    .time-unit {
+        min-width: 60px;
+        padding: 0.8rem;
+    }
+    
+    .time-unit span {
+        font-size: 1.5rem;
+    }
+    
+    .cover-container {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .player-container {
+        padding: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .style-options {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo h1 {
+        font-size: 2.5rem;
+    }
+    
+    .countdown {
+        gap: 0.5rem;
+    }
+    
+    .time-unit {
+        min-width: 50px;
+        padding: 0.6rem;
+    }
+    
+    .time-unit span {
+        font-size: 1.2rem;
+    }
+    
+    .cover-container {
+        width: 180px;
+        height: 180px;
+    }
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.play-pause-btn.playing {
+    animation: pulse 2s infinite;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(74, 144, 226, 0.6);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+    }
+}
+
+.time-unit {
+    animation: glow 3s infinite;
+}

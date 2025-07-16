@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disonancia Player - Reproductor Musical</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <!-- Canvas de fondo para animación de galaxia -->
+    <canvas id="background-canvas"></canvas>
+    
+    <!-- Pantalla de inicio -->
+    <div id="home-screen" class="screen active">
+        <div class="home-content">
+            <div class="logo">
+                <h1>Disonancia</h1>
+                <p>Reproductor Musical</p>
+            </div>
+            
+            <!-- Contador regresivo -->
+            <div class="countdown-container">
+                <h2>Próximo Lanzamiento</h2>
+                <div class="countdown">
+                    <div class="time-unit">
+                        <span id="days">00</span>
+                        <label>Días</label>
+                    </div>
+                    <div class="time-unit">
+                        <span id="hours">00</span>
+                        <label>Horas</label>
+                    </div>
+                    <div class="time-unit">
+                        <span id="minutes">00</span>
+                        <label>Minutos</label>
+                    </div>
+                    <div class="time-unit">
+                        <span id="seconds">00</span>
+                        <label>Segundos</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botón reproducir -->
+            <button id="play-button" class="main-button">
+                <span>▶</span>
+                Reproducir
+            </button>
+        </div>
+    </div>
+    
+    <!-- Pantalla del reproductor -->
+    <div id="player-screen" class="screen">
+        <div class="player-container">
+            <!-- Botón de regreso -->
+            <button id="back-button" class="back-btn">←</button>
+            
+            <!-- Cover del álbum -->
+            <div class="cover-container">
+                <img id="album-cover" src="" alt="Album Cover">
+                
+                <!-- Canvas de visualización 3D (oculto por defecto) -->
+                <canvas id="visualizer-canvas" class="visualizer-canvas hidden"></canvas>
+            </div>
+            
+            <!-- Información de la canción -->
+            <div class="song-info">
+                <h2 id="song-title"></h2>
+                <p id="song-artist"></p>
+            </div>
+            
+            <!-- Waveform -->
+            <div id="waveform-container" class="waveform-container"></div>
+            
+            <!-- Controles de reproducción -->
+            <div class="player-controls">
+                <!-- Tiempo transcurrido y restante -->
+                <div class="time-display">
+                    <span id="current-time">0:00</span>
+                    <span id="total-time">0:00</span>
+                </div>
+                
+                <!-- Botón play/pausa -->
+                <button id="play-pause-btn" class="play-pause-btn">
+                    <span class="play-icon">▶</span>
+                    <span class="pause-icon hidden">⏸</span>
+                </button>
+                
+                <!-- Control de volumen -->
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" id="volume-slider" min="0" max="100" value="70" class="volume-slider">
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <button id="presave-btn" class="action-btn presave-btn">
+                    💾 Pre-save en Spotify
+                </button>
+                <button id="share-btn" class="action-btn share-btn">
+                    📤 Compartir
+                </button>
+            </div>
+            
+            <!-- Botón de visualización -->
+            <button id="visualizer-toggle" class="visualizer-toggle">
+                🎨 Visualización
+            </button>
+            
+            <!-- Selector de estilos de visualización -->
+            <div id="style-selector" class="style-selector hidden">
+                <h3>Estilo de Visualización</h3>
+                <div class="style-options">
+                    <button class="style-btn active" data-style="0">Galaxia</button>
+                    <button class="style-btn" data-style="1">Nebulosa</button>
+                    <button class="style-btn" data-style="2">Cosmos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Canvas oculto para compartir -->
+    <canvas id="share-canvas" style="display: none;"></canvas>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/wavesurfer.js@7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/background.js"></script>
+    <script src="./js/countdown.js"></script>
+    <script src="./js/player.js"></script>
+    <script src="./js/visualizer.js"></script>
+    <script src="./js/share.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>
