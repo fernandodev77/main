@@ -456,8 +456,12 @@ function generateAnimatedShare() {
  */
 function generateAnimatedGif() {
     const shareCanvas = document.getElementById('share-canvas');
-    const width = shareCanvas.width;
-    const height = shareCanvas.height;
+    
+    // Configurar formato vertical para Instagram Stories (9:16)
+    const width = 1080;
+    const height = 1920;
+    shareCanvas.width = width;
+    shareCanvas.height = height;
     
     const gif = new GIF({
         workers: 2,
@@ -489,7 +493,7 @@ function generateAnimatedGif() {
         drawAnimatedBackground(tempCtx, width, height, frameCount);
         
         // Dibujar overlay con información de la canción
-        drawSongOverlay(tempCtx, width, height);
+        drawSongOverlay(tempCtx, width, height, frameCount);
         
         // Agregar frame al GIF
         gif.addFrame(tempCanvas, {delay: delay});
@@ -519,8 +523,12 @@ function generateAnimatedGif() {
 function generateAnimatedWebM() {
     const shareCanvas = document.getElementById('share-canvas');
     const shareCtx = shareCanvas.getContext('2d');
-    const width = shareCanvas.width;
-    const height = shareCanvas.height;
+    
+    // Configurar formato vertical para Instagram Stories (9:16)
+    const width = 1080;
+    const height = 1920;
+    shareCanvas.width = width;
+    shareCanvas.height = height;
     
     // Configuración para el WebM
     const duration = 5000; // 5 segundos
@@ -540,7 +548,7 @@ function generateAnimatedWebM() {
         drawAnimatedBackground(shareCtx, width, height, currentFrame);
         
         // Dibujar overlay con información de la canción
-        drawSongOverlay(shareCtx, width, height);
+        drawSongOverlay(shareCtx, width, height, currentFrame);
         
         // Capturar frame como ImageData
         const imageData = shareCtx.getImageData(0, 0, width, height);
@@ -656,55 +664,154 @@ function drawAnimatedBackground(ctx, width, height, frameIndex) {
 /**
  * Dibuja la información de la canción sobre la animación
  */
-function drawSongOverlay(ctx, width, height) {
-    // Semi-transparente overlay para legibilidad
+function drawSongOverlay(ctx, width, height, frameIndex = 0) {
+    const progress = frameIndex / 75; // 75 frames total (5 segundos * 15 fps)
+    
+    // Portada del álbum en la parte superior
+    const coverImage = new Image();
+    coverImage.src = CONFIG.songInfo.coverImage;
+    
+    // Tamaño y posición de la portada para formato vertical
+    const coverSize = width * 0.6; // Más grande para formato vertical
+    const coverX = (width - coverSize) / 2;
+    const coverY = height * 0.15;
+    
+    // Efecto de pulsación en la portada
+    const pulseScale = 1 + Math.sin(progress * Math.PI * 8) * 0.05;
+    const scaledSize = coverSize * pulseScale;
+    const scaledX = coverX - (scaledSize - coverSize) / 2;
+    const scaledY = coverY - (scaledSize - coverSize) / 2;
+    
+    // Dibujar sombra animada de la portada
     ctx.save();
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    ctx.fillRect(0, height * 0.4, width, height * 0.4);
+    ctx.shadowColor = `rgba(124, 58, 237, ${0.3 + Math.sin(progress * Math.PI * 4) * 0.2})`;
+    ctx.shadowBlur = 40 + Math.sin(progress * Math.PI * 6) * 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 15;
+    
+    // Dibujar portada con bordes redondeados
+    ctx.save();
+    roundedImage(ctx, scaledX, scaledY, scaledSize, scaledSize, 30);
+    ctx.clip();
+    if (coverImage.complete) {
+        ctx.drawImage(coverImage, scaledX, scaledY, scaledSize, scaledSize);
+    }
+    ctx.restore();
     ctx.restore();
     
-    // Información de la canción
+    // Área de información con gradiente animado
+    const infoY = height * 0.55;
+    const infoHeight = height * 0.35;
+    
+    const gradient = ctx.createLinearGradient(0, infoY, 0, infoY + infoHeight);
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
+    gradient.addColorStop(0.5, 'rgba(26, 26, 46, 0.9)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.95)');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, infoY, width, infoHeight);
+    
+    // Información de la canción con animaciones
     ctx.textAlign = 'center';
     
-    // Título de la canción
-    ctx.font = 'bold 60px Arial';
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-    ctx.lineWidth = 2;
-    ctx.strokeText(CONFIG.songInfo.title, width / 2, height * 0.55);
-    ctx.fillText(CONFIG.songInfo.title, width / 2, height * 0.55);
+    // Título de la canción con efecto de brillo
+    const titleY = height * 0.65;
+    const titleGlow = Math.sin(progress * Math.PI * 3) * 0.5 + 0.5;
     
-    // Nombre del artista
-    ctx.font = '40px Arial';
+    ctx.save();
+    ctx.shadowColor = `rgba(255, 255, 255, ${titleGlow})`;
+    ctx.shadowBlur = 20;
+    ctx.font = 'bold 72px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = 'rgba(124, 58, 237, 0.8)';
+    ctx.lineWidth = 3;
+    
+    // Efecto de escritura animada
+    const titleText = CONFIG.songInfo.title;
+    const titleProgress = Math.min(1, progress * 2);
+    const visibleTitle = titleText.substring(0, Math.floor(titleText.length * titleProgress));
+    
+    ctx.strokeText(visibleTitle, width / 2, titleY);
+    ctx.fillText(visibleTitle, width / 2, titleY);
+    ctx.restore();
+    
+    // Nombre del artista con efecto de desvanecimiento
+    const artistY = titleY + 90;
+    const artistOpacity = Math.max(0, Math.min(1, (progress - 0.3) * 2));
+    
+    ctx.save();
+    ctx.globalAlpha = artistOpacity;
+    ctx.font = '48px Arial';
     ctx.fillStyle = CONFIG.visualizer.colors.secondary;
-    ctx.strokeText(CONFIG.songInfo.artist, width / 2, height * 0.55 + 60);
-    ctx.fillText(CONFIG.songInfo.artist, width / 2, height * 0.55 + 60);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.lineWidth = 2;
     
-    // Texto promocional
-    ctx.font = 'bold 30px Arial';
+    const artistText = CONFIG.songInfo.artist;
+    const artistProgress = Math.max(0, Math.min(1, (progress - 0.3) * 2));
+    const visibleArtist = artistText.substring(0, Math.floor(artistText.length * artistProgress));
+    
+    ctx.strokeText(visibleArtist, width / 2, artistY);
+    ctx.fillText(visibleArtist, width / 2, artistY);
+    ctx.restore();
+    
+    // Texto promocional con animación de entrada
+    const promoY = height * 0.8;
+    const promoOpacity = Math.max(0, Math.min(1, (progress - 0.5) * 2));
+    
+    ctx.save();
+    ctx.globalAlpha = promoOpacity;
+    ctx.font = 'bold 36px Arial';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(CONFIG.sharing.text, width / 2, height * 0.75);
+    ctx.shadowColor = 'rgba(124, 58, 237, 0.5)';
+    ctx.shadowBlur = 10;
+    ctx.fillText(CONFIG.sharing.text, width / 2, promoY);
+    ctx.restore();
     
-    // Hashtags
+    // Hashtags con efecto de parpadeo
     if (CONFIG.sharing.hashtags && CONFIG.sharing.hashtags.length > 0) {
-        ctx.font = '25px Arial';
+        const hashtagY = promoY + 50;
+        const hashtagOpacity = Math.max(0, Math.min(1, (progress - 0.6) * 2)) * (0.7 + Math.sin(progress * Math.PI * 6) * 0.3);
+        
+        ctx.save();
+        ctx.globalAlpha = hashtagOpacity;
+        ctx.font = '30px Arial';
         ctx.fillStyle = CONFIG.visualizer.colors.secondary;
-        ctx.fillText(CONFIG.sharing.hashtags.join(' '), width / 2, height * 0.75 + 40);
+        ctx.fillText(CONFIG.sharing.hashtags.join(' '), width / 2, hashtagY);
+        ctx.restore();
     }
     
-    // URL
+    // URL con entrada deslizante
     if (CONFIG.sharing.url) {
-        ctx.font = '28px Arial';
+        const urlY = height * 0.88;
+        const urlProgress = Math.max(0, Math.min(1, (progress - 0.7) * 3));
+        const urlX = width / 2 + (1 - urlProgress) * width;
+        
+        ctx.save();
+        ctx.globalAlpha = urlProgress;
+        ctx.font = '32px Arial';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(CONFIG.sharing.url, width / 2, height * 0.85);
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 5;
+        ctx.fillText(CONFIG.sharing.url, urlX, urlY);
+        ctx.restore();
     }
     
-    // Días restantes para el lanzamiento
+    // Días restantes con efecto pulsante
     const daysUntilRelease = getDaysUntilRelease();
     if (daysUntilRelease > 0) {
-        ctx.font = 'bold 35px Arial';
+        const daysY = height * 0.95;
+        const daysPulse = 1 + Math.sin(progress * Math.PI * 4) * 0.1;
+        const daysOpacity = Math.max(0, Math.min(1, (progress - 0.8) * 2));
+        
+        ctx.save();
+        ctx.globalAlpha = daysOpacity;
+        ctx.scale(daysPulse, daysPulse);
+        ctx.font = 'bold 40px Arial';
         ctx.fillStyle = CONFIG.visualizer.colors.primary;
-        ctx.fillText(`¡${daysUntilRelease} días para el lanzamiento!`, width / 2, height * 0.92);
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(`¡${daysUntilRelease} días para el lanzamiento!`, width / 2 / daysPulse, daysY / daysPulse);
+        ctx.restore();
     }
 }
 
