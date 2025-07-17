@@ -301,15 +301,14 @@ class AudioVisualizer {
             });
         }
         
-        // Botones de estilo
-        const styleButtons = document.querySelectorAll('.style-btn');
-        styleButtons.forEach((btn, index) => {
-            btn.addEventListener('click', () => {
-                const styleIndex = parseInt(btn.getAttribute('data-style')) || index;
+        // Selector dropdown de estilo
+        const styleSelect = document.getElementById('style-select');
+        if (styleSelect) {
+            styleSelect.addEventListener('change', () => {
+                const styleIndex = parseInt(styleSelect.value);
                 this.changeStyle(styleIndex);
-                this.updateStyleButtons(styleIndex);
             });
-        });
+        }
         
         // Redimensionar
         window.addEventListener('resize', () => {
@@ -322,21 +321,25 @@ class AudioVisualizer {
         
         const canvas = document.getElementById('visualizer-canvas');
         const coverContainer = document.getElementById('cover-container');
-        const styleSelector = document.getElementById('style-selector');
+        const styleSelect = document.getElementById('style-select');
         
         if (isAnimationMode) {
             // Mostrar animación, ocultar cover
             canvas.classList.remove('hidden');
             coverContainer.style.opacity = '0';
             coverContainer.style.pointerEvents = 'none';
-            styleSelector.classList.remove('hidden');
+            if (styleSelect) {
+                styleSelect.parentElement.classList.remove('hidden');
+            }
             this.startAnimation();
         } else {
             // Mostrar cover, ocultar animación
             canvas.classList.add('hidden');
             coverContainer.style.opacity = '1';
             coverContainer.style.pointerEvents = 'auto';
-            styleSelector.classList.add('hidden');
+            if (styleSelect) {
+                styleSelect.parentElement.classList.add('hidden');
+            }
             this.stopAnimation();
         }
     }
@@ -355,17 +358,6 @@ class AudioVisualizer {
             this.currentStyle = styleIndex;
             this.createVisualization();
         }
-    }
-    
-    updateStyleButtons(activeIndex) {
-        const styleButtons = document.querySelectorAll('.style-btn');
-        styleButtons.forEach((btn, index) => {
-            if (index === activeIndex) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
     }
     
     setAudioData(audioData) {

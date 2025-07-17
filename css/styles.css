@@ -143,20 +143,24 @@ body {
     font-size: 1.5rem;
 }
 
-/* Switch de modo visualización (navbar fijo) */
-.navbar-switch {
+/* Navbar de visualización */
+.visualization-navbar {
     position: fixed;
-    top: 1rem;
-    right: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
     z-index: 1000;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 25px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
+}
+
+.navbar-controls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: rgba(0, 0, 0, 0.8);
+    gap: 0.8rem;
     padding: 0.5rem 1rem;
-    border-radius: 25px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .switch-label {
@@ -213,11 +217,11 @@ input:checked + .slider:before {
 
 /* Pantalla del reproductor */
 .player-container {
-   
     width: 100%;
+    max-width: 500px;
     margin: 0 auto;
     text-align: center;
-    
+    padding: 4rem 2rem 2rem 2rem;
 }
 
 
@@ -244,32 +248,57 @@ input:checked + .slider:before {
     transform: scale(1.1);
 }
 
-/* Selector de estilos en la parte superior */
-.style-selector-top {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(123, 104, 238, 0.3);
+/* Selector de estilos dropdown discreto */
+.style-selector-dropdown {
     transition: all 0.3s ease;
 }
 
-.style-selector-top.hidden {
+.style-selector-dropdown.hidden {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(10px);
     pointer-events: none;
-    margin-bottom: 0;
-    padding: 0;
-    height: 0;
+    width: 0;
     overflow: hidden;
+}
+
+.style-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 0.4rem 0.8rem;
+    color: white;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
+}
+
+.style-select:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.style-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3), 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
+}
+
+.style-select option {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.5rem;
 }
 
 /* Área de visualización */
 .visualization-area {
     width: 100%;
     aspect-ratio: 1/1;
-
+    margin-bottom: 3rem;
+    margin-top: 1rem;
+    position: relative;
 }
 
 
@@ -281,9 +310,8 @@ input:checked + .slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
     transition: all 0.3s ease;
 }
 
@@ -297,20 +325,14 @@ input:checked + .slider:before {
 .visualizer-canvas {
     width: 100%;
     height: 100%;
-    object-fit:cover;
+    object-fit: cover;
     display: block;
-  
-    
     overflow: hidden;
-    
     background: rgba(0, 0, 0, 0.3);
     border: 2px solid rgba(123, 104, 238, 0.2);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
-}
-
-.visualizer-canvas:not(.hidden) {
-    box-shadow: 0 20px 40px rgba(123, 104, 238, 0.3);
+    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
 }
 
 .visualizer-canvas.hidden {
@@ -321,7 +343,8 @@ input:checked + .slider:before {
 
 /* Información de la canción */
 .song-info {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding: 0 1rem;
 }
 
 .song-info h2 {
@@ -337,7 +360,7 @@ input:checked + .slider:before {
 
 /* Waveform */
 .waveform-container {
-    margin-bottom: 2rem;
+    margin: 0 1rem 2rem 1rem;
     height: 80px;
     border-radius: 10px;
     overflow: hidden;
@@ -461,34 +484,7 @@ input:checked + .slider:before {
 
 
 
-.style-options {
-    display: flex;
-    gap: 0.3rem;
-    justify-content: center;
-}
-
-.style-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-    padding: 0.4rem 0.8rem;
-    color: white;
-    font-size: 0.7rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 60px;
-}
-
-.style-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-.style-btn.active {
-    background: linear-gradient(45deg, #4a90e2, #7b68ee);
-    border-color: #4a90e2;
-    box-shadow: 0 2px 10px rgba(74, 144, 226, 0.3);
-}
+/* Estilos antiguos de botones removidos - ahora se usa dropdown */
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -520,10 +516,33 @@ input:checked + .slider:before {
         font-size: 1.5rem;
     }
     
-    .navbar-switch {
-        top: 0.5rem;
-        right: 0.5rem;
+    .visualization-navbar {
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .navbar-controls {
         padding: 0.4rem 0.8rem;
+        gap: 0.6rem;
+    }
+    
+    .player-container {
+        padding: 3rem 1.5rem 1.5rem 1.5rem;
+        max-width: 450px;
+    }
+    
+    .waveform-container {
+        margin: 0 0.5rem 2rem 0.5rem;
+    }
+    
+    .song-info {
+        padding: 0 0.5rem;
+    }
+    
+    .style-select {
+        min-width: 70px;
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
     }
     
     .switch-label {
@@ -535,16 +554,6 @@ input:checked + .slider:before {
     
     .action-buttons {
         flex-direction: column;
-    }
-    
-    .style-options {
-        gap: 0.2rem;
-    }
-    
-    .style-btn {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.65rem;
-        min-width: 50px;
     }
 }
 
@@ -566,10 +575,28 @@ input:checked + .slider:before {
         font-size: 1.2rem;
     }
     
-    .navbar-switch {
-        top: 0.3rem;
-        right: 0.3rem;
+    .visualization-navbar {
+        top: 0.8rem;
+        right: 0.8rem;
+    }
+    
+    .navbar-controls {
         padding: 0.3rem 0.6rem;
+        gap: 0.5rem;
+    }
+    
+    .player-container {
+        padding: 2.5rem 1rem 1rem 1rem;
+        max-width: 400px;
+    }
+    
+    .waveform-container {
+        margin: 0 0.3rem 1.5rem 0.3rem;
+    }
+    
+    .song-info {
+        padding: 0 0.3rem;
+        margin-bottom: 2rem;
     }
     
     .switch {
@@ -590,33 +617,41 @@ input:checked + .slider:before {
         font-size: 0.65rem;
     }
     
-    
-    
-    
-    
-    .style-selector-top {
-        padding: 0.3rem;
+    .style-select {
+        min-width: 60px;
+        font-size: 0.65rem;
+        padding: 0.25rem 0.5rem;
     }
-    
-    .style-options {
-        flex-direction: column;
-        gap: 0.2rem;
-    }
-    
-    .style-btn {
-         padding: 0.3rem 0.5rem;
-         font-size: 0.6rem;
-     }
  }
  
  @media (max-width: 320px) {
+     .visualization-navbar {
+         top: 0.5rem;
+         right: 0.5rem;
+     }
      
+     .navbar-controls {
+         padding: 0.2rem 0.4rem;
+         gap: 0.4rem;
+     }
      
+     .player-container {
+         padding: 2rem 0.8rem 0.8rem 0.8rem;
+         max-width: 350px;
+     }
      
+     .waveform-container {
+         margin: 0 0.2rem 1rem 0.2rem;
+     }
      
-     .navbar-switch {
-         top: 0.2rem;
-         right: 0.2rem;
+     .song-info {
+         padding: 0 0.2rem;
+         margin-bottom: 1.5rem;
+     }
+     
+     .style-select {
+         min-width: 50px;
+         font-size: 0.6rem;
          padding: 0.2rem 0.4rem;
      }
  }

@@ -223,7 +223,8 @@ class MusicPlayer {
     
     updateTimeDisplay() {
         this.elements.currentTimeDisplay.textContent = this.formatTime(this.currentTime);
-        this.elements.totalTimeDisplay.textContent = this.formatTime(this.duration);
+        const remainingTime = Math.max(0, this.duration - this.currentTime);
+        this.elements.totalTimeDisplay.textContent = '-' + this.formatTime(remainingTime);
     }
     
     formatTime(seconds) {

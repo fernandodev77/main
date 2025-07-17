@@ -51,27 +51,28 @@
     
     <!-- Pantalla del reproductor -->
     <div id="player-screen" class="screen">
-        <!-- Switch de modo visualización (navbar fijo) -->
-        <div class="navbar-switch">
-            <label class="switch">
-                <input type="checkbox" id="visualization-mode-toggle">
-                <span class="slider"></span>
-            </label>
-            <span class="switch-label">Animación</span>
+        <!-- Navbar con controles de visualización -->
+        <div class="visualization-navbar">
+            <div class="navbar-controls">
+                <label class="switch">
+                    <input type="checkbox" id="visualization-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label">Animación</span>
+                
+                <!-- Selector de estilos discreto -->
+                <div class="style-selector-dropdown hidden" id="style-selector">
+                    <select id="style-select" class="style-select">
+                        <option value="0">Galaxia</option>
+                        <option value="1">Nebulosa</option>
+                        <option value="2">Cosmos</option>
+                    </select>
+                </div>
+            </div>
         </div>
         
         <div class="player-container">
             <!-- Botón de regreso -->
-            <button id="back-button" class="back-btn">←</button>
-            
-            <!-- Selector de estilos de visualización (solo visible en modo animación) -->
-            <div id="style-selector" class="style-selector-top hidden">
-                <div class="style-options">
-                    <button class="style-btn active" data-style="0">Galaxia</button>
-                    <button class="style-btn" data-style="1">Nebulosa</button>
-                    <button class="style-btn" data-style="2">Cosmos</button>
-                </div>
-            </div>
             
             <!-- Área de visualización (cover o canvas) -->
             <div class="visualization-area">
