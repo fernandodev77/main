@@ -9,8 +9,7 @@ body {
     font-family: 'Arial', sans-serif;
     background: #000;
     color: #fff;
-    overflow: hidden;
-    height: 100vh;
+    min-height: 100vh;
     position: relative;
 }
 
@@ -31,7 +30,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,6 +38,7 @@ body {
     visibility: hidden;
     transition: all 0.5s ease;
     z-index: 1;
+    overflow-y: auto;
 }
 
 .screen.active {
@@ -216,12 +216,17 @@ input:checked + .slider:before {
 }
 
 /* Pantalla del reproductor */
+#player-screen {
+    align-items: flex-start;
+    padding-top: 2rem;
+}
+
 .player-container {
     width: 100%;
     max-width: 500px;
     margin: 0 auto;
     text-align: center;
-    padding: 4rem 2rem 2rem 2rem;
+    padding: 2rem 2rem 4rem 2rem;
 }
 
 
@@ -272,7 +277,6 @@ input:checked + .slider:before {
     transition: all 0.3s ease;
     min-width: 80px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
 }
 
 .style-select:hover {
@@ -283,7 +287,7 @@ input:checked + .slider:before {
 .style-select:focus {
     outline: none;
     border-color: #4a90e2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3), 0 10px 30px rgba(74, 144, 226, 0.3), 0 20px 40px rgba(123, 104, 238, 0.3);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
 }
 
 .style-select option {
@@ -297,7 +301,7 @@ input:checked + .slider:before {
     width: 100%;
     aspect-ratio: 1/1;
     margin-bottom: 3rem;
-    margin-top: 1rem;
+    margin-top: 2.5rem;
     position: relative;
 }
 
@@ -527,8 +531,12 @@ input:checked + .slider:before {
     }
     
     .player-container {
-        padding: 3rem 1.5rem 1.5rem 1.5rem;
+        padding: 1.5rem 1.5rem 3rem 1.5rem;
         max-width: 450px;
+    }
+    
+    .visualization-area {
+        margin-top: 2rem;
     }
     
     .waveform-container {
@@ -586,8 +594,12 @@ input:checked + .slider:before {
     }
     
     .player-container {
-        padding: 2.5rem 1rem 1rem 1rem;
+        padding: 1rem 1rem 2.5rem 1rem;
         max-width: 400px;
+    }
+    
+    .visualization-area {
+        margin-top: 1.5rem;
     }
     
     .waveform-container {
@@ -636,8 +648,12 @@ input:checked + .slider:before {
      }
      
      .player-container {
-         padding: 2rem 0.8rem 0.8rem 0.8rem;
+         padding: 0.8rem 0.8rem 2rem 0.8rem;
          max-width: 350px;
+     }
+     
+     .visualization-area {
+         margin-top: 1rem;
      }
      
      .waveform-container {
