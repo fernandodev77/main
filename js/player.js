@@ -34,11 +34,37 @@ class MusicPlayer {
             await this.initWaveSurfer();
             this.setupEventListeners();
             this.loadSongInfo();
+            // Configurar handlers de Media Session (acciones del sistema)
+            this.setupMediaSessionActionHandlers();
         } catch (error) {
             console.error('Error inicializando el reproductor:', error);
         }
     }
     
+    // Utilidad para obtener un valor localizado desde config (string u objeto por idioma)
+    getLocalizedValue(value) {
+        if (typeof value === 'string') return value;
+        if (value && typeof value === 'object') {
+            const lang = (navigator.language || 'es').toLowerCase();
+            const base = lang.split('-')[0];
+            return value[lang] || value[base] || value.es || value.en || Object.values(value)[0] || '';
+        }
+        return '';
+    }
+    
+    // Inferir mime-type de la imagen de portada
+    getArtworkMimeType(src) {
+        if (!src || typeof src !== 'string') return 'image/jpeg';
+        const ext = src.split('.').pop().toLowerCase();
+        switch (ext) {
+            case 'png': return 'image/png';
+            case 'webp': return 'image/webp';
+            case 'gif': return 'image/gif';
+            case 'jpg':
+            case 'jpeg':
+            default: return 'image/jpeg';
+        }
+    }
     async initWaveSurfer() {
         // Crear instancia de WaveSurfer
         this.wavesurfer = WaveSurfer.create({
@@ -65,6 +91,10 @@ class MusicPlayer {
             // Configurar analizador de audio después de que esté listo
             setTimeout(() => {
                 this.setupAudioAnalyser();
+                // Inicializar metadata y estado para Media Session cuando el audio esté listo
+                this.setupMediaSession();
+                this.updatePlaybackState();
+                this.updatePositionState();
             }, 100);
         });
         
@@ -72,22 +102,29 @@ class MusicPlayer {
             this.currentTime = this.wavesurfer.getCurrentTime();
             this.updateTimeDisplay();
             this.updateAudioData();
+            // Actualizar posición para controles del sistema (Media Session)
+            this.updatePositionState();
         });
         
         this.wavesurfer.on('play', () => {
             this.isPlaying = true;
             this.updatePlayButton();
+            this.updatePlaybackState();
         });
         
         this.wavesurfer.on('pause', () => {
             this.isPlaying = false;
             this.updatePlayButton();
+            this.updatePlaybackState();
         });
         
         this.wavesurfer.on('finish', () => {
             this.isPlaying = false;
             this.updatePlayButton();
             this.wavesurfer.seekTo(0);
+            this.currentTime = 0;
+            this.updatePlaybackState();
+            this.updatePositionState();
         });
         
         // Configurar volumen inicial
@@ -173,12 +210,15 @@ class MusicPlayer {
     
     loadSongInfo() {
         // Cargar información de la canción
+        const localizedTitle = this.getLocalizedValue(CONFIG.songInfo.title);
+        const localizedArtist = this.getLocalizedValue(CONFIG.songInfo.artist);
         this.elements.albumCover.src = CONFIG.songInfo.coverImage;
-        this.elements.albumCover.alt = `${CONFIG.songInfo.title} - ${CONFIG.songInfo.artist}`;
-        this.elements.songTitle.textContent = CONFIG.songInfo.title;
-        this.elements.songArtist.textContent = CONFIG.songInfo.artist;
+        this.elements.albumCover.alt = `${localizedTitle} - ${localizedArtist}`;
+        this.elements.songTitle.textContent = localizedTitle;
+        this.elements.songArtist.textContent = localizedArtist;
+        // Preparar metadata para Media Session usando la información de CONFIG
+        this.setupMediaSession();
     }
-    
     togglePlayPause() {
         if (this.wavesurfer) {
             this.wavesurfer.playPause();
@@ -250,7 +290,84 @@ class MusicPlayer {
             console.error('Función de compartir no disponible');
         }
     }
-    
+
+    // === Integración con Media Session API ===
+    setupMediaSession() {
+        if (!('mediaSession' in navigator)) return;
+        const title = this.getLocalizedValue(CONFIG.songInfo.title);
+        const artist = this.getLocalizedValue(CONFIG.songInfo.artist);
+        const album = this.getLocalizedValue(CONFIG.songInfo.album);
+        const coverImage = CONFIG.songInfo.coverImage;
+        const artwork = coverImage ? [
+            { src: coverImage, sizes: '512x512', type: this.getArtworkMimeType(coverImage) }
+        ] : [];
+        try {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: title || '',
+                artist: artist || '',
+                album: album || '',
+                artwork
+            });
+        } catch (e) {
+            console.warn('No se pudo establecer la metadata de Media Session:', e);
+        }
+    }
+
+    setupMediaSessionActionHandlers() {
+        if (!('mediaSession' in navigator)) return;
+        try {
+            navigator.mediaSession.setActionHandler('play', () => this.play());
+            navigator.mediaSession.setActionHandler('pause', () => this.pause());
+            navigator.mediaSession.setActionHandler('seekforward', (details) => {
+                const offset = details.seekOffset || 10;
+                const newTime = Math.min(this.getDuration(), this.getCurrentTime() + offset);
+                if (this.getDuration() > 0) this.seekTo(newTime / this.getDuration());
+                this.updatePositionState();
+            });
+            navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+                const offset = details.seekOffset || 10;
+                const newTime = Math.max(0, this.getCurrentTime() - offset);
+                if (this.getDuration() > 0) this.seekTo(newTime / this.getDuration());
+                this.updatePositionState();
+            });
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (typeof details.position === 'number' && this.getDuration() > 0) {
+                    const ratio = Math.min(1, Math.max(0, details.position / this.getDuration()));
+                    this.seekTo(ratio);
+                    this.updatePositionState();
+                }
+            });
+            // En un solo track, podemos reiniciar al inicio
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+                if (this.getDuration() > 0) this.seekTo(0);
+            });
+            // No hay siguiente pista en este reproductor
+            navigator.mediaSession.setActionHandler('nexttrack', () => {});
+        } catch (e) {
+            console.warn('No se pudieron configurar los handlers de Media Session:', e);
+        }
+    }
+
+    updatePlaybackState() {
+        if (!('mediaSession' in navigator)) return;
+        try {
+            navigator.mediaSession.playbackState = this.isPlaying ? 'playing' : 'paused';
+        } catch (e) {}
+    }
+
+    updatePositionState() {
+        if (!('mediaSession' in navigator)) return;
+        if (!isFinite(this.getDuration())) return;
+        try {
+            navigator.mediaSession.setPositionState({
+                duration: this.getDuration() || 0,
+                position: this.getCurrentTime() || 0,
+                playbackRate: 1.0
+            });
+        } catch (e) {
+            // Algunos navegadores no soportan setPositionState
+        }
+    }
     getAudioData() {
         return this.audioData;
     }
