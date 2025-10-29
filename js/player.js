@@ -65,6 +65,14 @@ class MusicPlayer {
             default: return 'image/jpeg';
         }
     }
+    
+    // Detección de iOS Safari para ajustar backend
+    isIosSafari() {
+        const ua = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua);
+        const isSafari = /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua);
+        return isIOS && isSafari;
+    }
     async initWaveSurfer() {
         // Crear instancia de WaveSurfer
         this.wavesurfer = WaveSurfer.create({
@@ -77,7 +85,7 @@ class MusicPlayer {
             responsive: true,
             height: 80,
             normalize: true,
-            backend: 'WebAudio',
+            backend: this.isIosSafari() ? 'MediaElement' : 'WebAudio',
             mediaControls: false
         });
         
@@ -88,14 +96,24 @@ class MusicPlayer {
         this.wavesurfer.on('ready', () => {
             this.duration = this.wavesurfer.getDuration();
             this.updateTimeDisplay();
-            // Configurar analizador de audio después de que esté listo
-            setTimeout(() => {
-                this.setupAudioAnalyser();
-                // Inicializar metadata y estado para Media Session cuando el audio esté listo
-                this.setupMediaSession();
-                this.updatePlaybackState();
-                this.updatePositionState();
-            }, 100);
+            // En iOS Safari, asegurar atributos del elemento media
+            if (this.isIosSafari() && typeof this.wavesurfer.getMediaElement === 'function') {
+                const mediaEl = this.wavesurfer.getMediaElement();
+                if (mediaEl) {
+                    mediaEl.setAttribute('preload', 'auto');
+                    mediaEl.setAttribute('playsinline', 'true');
+                    mediaEl.crossOrigin = 'anonymous';
+                    mediaEl.controls = false;
+                }
+            }
+             // Configurar analizador de audio después de que esté listo
+             setTimeout(() => {
+                 this.setupAudioAnalyser();
+                 // Inicializar metadata y estado para Media Session cuando el audio esté listo
+                 this.setupMediaSession();
+                 this.updatePlaybackState();
+                 this.updatePositionState();
+             }, 100);
         });
         
         this.wavesurfer.on('audioprocess', () => {
@@ -106,6 +124,13 @@ class MusicPlayer {
             this.updatePositionState();
         });
         
+        // En algunos backends, usar timeupdate para asegurar actualización de tiempo
+        this.wavesurfer.on('timeupdate', (currentTime) => {
+            this.currentTime = typeof currentTime === 'number' ? currentTime : this.wavesurfer.getCurrentTime();
+            this.updateTimeDisplay();
+            this.updatePositionState();
+        });
+         
         this.wavesurfer.on('play', () => {
             this.isPlaying = true;
             this.updatePlayButton();
@@ -132,6 +157,12 @@ class MusicPlayer {
     }
     
     setupAudioAnalyser() {
+        // En iOS Safari, evitar crear AudioContext para no interferir con reproducción en segundo plano
+        if (this.isIosSafari()) {
+            this.analyser = null;
+            this.audioData = null;
+            return;
+        }
         // Esperar a que WaveSurfer esté completamente inicializado
         if (this.wavesurfer && this.wavesurfer.backend) {
             // Para WaveSurfer v7, el contexto de audio está en backend.ac
