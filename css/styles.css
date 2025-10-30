@@ -414,46 +414,7 @@ input:checked + .slider:before {
     pointer-events: none;
 }
 
-/* Control de volumen */
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: center;
-}
 
-.volume-icon {
-    font-size: 1.2rem;
-}
-
-.volume-slider {
-    width: 150px;
-    height: 5px;
-    border-radius: 5px;
-    background: rgba(255, 255, 255, 0.2);
-    outline: none;
-    -webkit-appearance: none;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #4a90e2;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
-}
-
-.volume-slider::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #4a90e2;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
-}
 
 /* Botones de acción */
 .action-buttons {

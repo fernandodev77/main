@@ -18,7 +18,6 @@ class MusicPlayer {
             pauseIcon: document.querySelector('.pause-icon'),
             currentTimeDisplay: document.getElementById('current-time'),
             totalTimeDisplay: document.getElementById('total-time'),
-            volumeSlider: document.getElementById('volume-slider'),
             albumCover: document.getElementById('album-cover'),
             songTitle: document.getElementById('song-title'),
             songArtist: document.getElementById('song-artist'),
@@ -215,10 +214,7 @@ class MusicPlayer {
         });
         
         // Control de volumen
-        this.elements.volumeSlider.addEventListener('input', (e) => {
-            const volume = e.target.value / 100;
-            this.setVolume(volume);
-        });
+        
         
         // Botón de pre-save
         this.elements.presaveBtn.addEventListener('click', () => {
